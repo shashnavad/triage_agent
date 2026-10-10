@@ -1,0 +1,18 @@
+# Environment variables and API keys
+.env
+*.env
+
+# Python runtime artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Execution and evaluation output artifacts
+results.json
+eval_report.json
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store

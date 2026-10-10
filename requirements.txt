@@ -1,0 +1,9 @@
+anthropic>=0.40
+pydantic>=2.6
+langgraph>=0.2
+rank_bm25>=0.2.2
+scikit-learn>=1.4
+numpy>=1.26
+pytest>=8.0
+# Optional: real embeddings for the dense retriever (set DENSE_BACKEND=minilm)
+# sentence-transformers>=3.0

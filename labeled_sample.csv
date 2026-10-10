@@ -1,0 +1,13 @@
+ticket_id,category,priority,product_area,deflectable
+T-1001,bug_defect,P0,general,no
+T-1002,access_account,P3,account_admin,yes
+T-1004,data_issue,P1,bank_feeds,no
+T-1005,how_to_question,P3,bank_feeds,yes
+T-1010,feature_request,P3,general,no
+T-1011,billing_contract,P2,general,no
+T-1012,access_account,P3,account_admin,yes
+T-1014,data_issue,P1,payments,no
+T-1020,bug_defect,P2,data_import,no
+T-1021,how_to_question,P3,data_import,yes
+T-1026,how_to_question,P3,invoicing,yes
+T-1029,bug_defect,P2,bank_feeds,no
