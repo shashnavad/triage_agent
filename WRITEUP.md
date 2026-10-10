@@ -1,9 +1,9 @@
 # WRITEUP: Support Ticket Triage & Deflection Agent
 
 ## Business impact
-The goal is to remove the human touch from tickets that are pure knowledge base lookups (16 of 38 tickets, about 42%, got a verified draft, with 0 false deflections on the labeled set) while making sure the risky ones (outage, data exposure, card numbers, prompt injection) always reach a person with a stated reason. A full run over 38 tickets takes about 32 seconds (12 seconds with 20 workers) and costs about $0.08, roughly $0.002 per ticket.
+The goal is to remove the human touch from tickets that are pure knowledge base lookups (15 to 17 of 38 tickets, about 40% to 45%, got a verified draft across runs, with 0 false deflections on the labeled set) while making sure the risky ones (outage, data exposure, card numbers, prompt injection) always reach a person with a stated reason. A full run over 38 tickets takes about 32 seconds (12 seconds with 20 workers) and costs about $0.08, roughly $0.002 per ticket.
 
-**Latest eval (3 runs):** 4-field exact match 83% (10 of 12) in every run, P0/P1 recall 67% to 100%, 0 false deflections, stability 96.5%. Product area and deflectable are 100% accurate. Priority is 100% except one P1/P2 flip on T-1004 in one run. The category misses are on two ambiguous labels (T-1004, T-1014).
+**Latest eval (3 runs):** 4-field exact match 83% (10 of 12) in every run, P0/P1 recall 100% in every run, 0 false deflections, stability 94.7% (92% to 97% across eval runs). In run 1, product area and deflectable are 100% accurate and priority is 100%. All misses are category on two ambiguous labels (T-1004, T-1014).
 
 ## Architecture and why
 A deterministic LangGraph state graph, not a free-form agent, so every ticket has an auditable path:
@@ -22,7 +22,7 @@ Tiering keeps the cheap model on the high-volume step and spends the stronger mo
 - **No fine-tuning:** 12 labels would overfit and add GPU cost for no gain.
 - **LangGraph** adds a dependency but makes routing explicit and testable.
 - **Label I would challenge:** T-1014 (held $48k payment) is labeled `data_issue` and the model says `billing_contract`. Neither fits, because the taxonomy has no payment-hold category. P1 is correct (payroll deadline).
-- **Borderline priority flips:** the current SDK has no temperature setting, so P1 versus P2 tickets (T-1004, T-1009) can flip between runs. This only changes queue order for tickets a human sees anyway.
+- **Borderline priority flips:** the current SDK has no temperature setting, so P1 versus P2 tickets (T-1009, T-1022, T-1036) can flip between runs. This only changes queue order for tickets a human sees anyway.
 
 ## What breaks at 10x and 100x
 | Volume | Wall time | Cost | First failure |

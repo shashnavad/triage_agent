@@ -358,7 +358,7 @@ Runs $N = 3$ repeated iterations across the sample dataset with default sampling
 * **Classification Stability Rate**: Measures consistency of taxonomy outputs across repeated runs.
 
 
-* Target: $> 95\%$ stability. Measured: 92.1% to 96.5%. Differences are borderline priority or category flips, plus rare deflect-or-human flips that fail safe.
+Target: $> 95\%$ stability. Measured: 92.1% to 96.5% across eval runs (latest 94.7%). Differences are borderline priority or category flips, plus occasional deflect-or-human flips on borderline tickets that fail safe.
 
 ### 3. Low-Confidence & Routing Heuristics
 

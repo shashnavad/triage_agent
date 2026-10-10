@@ -1,0 +1,146 @@
+{
+  "classification": {
+    "n_labeled": 12,
+    "exact_match": 0.8333333333333334,
+    "per_field_accuracy": {
+      "category": 0.8333333333333334,
+      "priority": 1.0,
+      "product_area": 1.0,
+      "deflectable": 1.0
+    },
+    "per_field_macro_f1": {
+      "category": 0.753968253968254,
+      "priority": 1.0,
+      "product_area": 1.0,
+      "deflectable": 1.0
+    },
+    "p0_p1_recall": 1.0,
+    "priority_downgrades": [],
+    "false_deflections": [],
+    "mismatches": {
+      "T-1004": {
+        "category": {
+          "pred": "bug_defect",
+          "label": "data_issue"
+        }
+      },
+      "T-1014": {
+        "category": {
+          "pred": "billing_contract",
+          "label": "data_issue"
+        }
+      }
+    }
+  },
+  "consistency": {
+    "stability": 0.9473684210526315,
+    "fully_stable_tickets": 32,
+    "n_tickets": 38,
+    "unstable": {
+      "T-1009": [
+        {
+          "category": "bug_defect",
+          "priority": "P1",
+          "product_area": "api_webhooks",
+          "deflectable": "no"
+        },
+        {
+          "category": "bug_defect",
+          "priority": "P2",
+          "product_area": "api_webhooks",
+          "deflectable": "no"
+        }
+      ],
+      "T-1022": [
+        {
+          "category": "security_privacy",
+          "priority": "P2",
+          "product_area": "account_admin",
+          "deflectable": "no"
+        },
+        {
+          "category": "security_privacy",
+          "priority": "P1",
+          "product_area": "account_admin",
+          "deflectable": "no"
+        }
+      ],
+      "T-1023": [
+        {
+          "category": "how_to_question",
+          "priority": "P3",
+          "product_area": "api_webhooks",
+          "deflectable": "yes"
+        },
+        {
+          "category": "bug_defect",
+          "priority": "P3",
+          "product_area": "api_webhooks",
+          "deflectable": "no"
+        }
+      ],
+      "T-1027": [
+        {
+          "category": "how_to_question",
+          "priority": "P3",
+          "product_area": "invoicing",
+          "deflectable": "no"
+        },
+        {
+          "category": "how_to_question",
+          "priority": "P3",
+          "product_area": "invoicing",
+          "deflectable": "yes"
+        }
+      ],
+      "T-1036": [
+        {
+          "category": "security_privacy",
+          "priority": "P1",
+          "product_area": "payments",
+          "deflectable": "no"
+        },
+        {
+          "category": "security_privacy",
+          "priority": "P2",
+          "product_area": "payments",
+          "deflectable": "no"
+        }
+      ],
+      "T-1037": [
+        {
+          "category": "how_to_question",
+          "priority": "P3",
+          "product_area": "api_webhooks",
+          "deflectable": "yes"
+        },
+        {
+          "category": "how_to_question",
+          "priority": "P3",
+          "product_area": "general",
+          "deflectable": "yes"
+        }
+      ]
+    }
+  },
+  "review_and_drafts": {
+    "confidence_threshold": 0.8,
+    "low_confidence_tickets": [
+      "T-1027",
+      "T-1030",
+      "T-1036"
+    ],
+    "labeled_flagged_accuracy": null,
+    "labeled_unflagged_accuracy": 0.8333333333333334,
+    "injection_flagged": [
+      "T-1017"
+    ],
+    "sensitive_data_flagged": [
+      "T-1036"
+    ],
+    "drafts_produced": 15,
+    "drafts_needing_correction": 1,
+    "drafts_failing_rule_check": [],
+    "false_deflections_on_labeled": []
+  }
+}
