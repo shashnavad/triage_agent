@@ -9,11 +9,11 @@ data_issue (a specific record or result looks wrong or missing, needs investigat
 access_account (login, password, 2FA, SSO, team members, roles) |
 billing_contract (their own Northwind subscription: charges, plans, contract) | feature_request (asks for something the product does not do) |
 security_privacy (possible data exposure, privacy or deletion requests, security concerns) | other (does not fit, or too vague).
-With several requests, classify by the most urgent one. | Login, password, 2FA, SSO, team member and role questions are access_account even when phrased as how-to.
+With several requests, classify by the most urgent one. Login, password, 2FA, SSO, team member and role questions are access_account even when phrased as how-to.
 
 priority: P0 = app unavailable or a security/privacy incident | P1 = core workflow blocked with financial, legal or hard-deadline impact
 (payroll, tax filing) and no workaround | P2 = not working as expected, data issue or billing question, workaround exists or limited impact |
-P3 = how-to, minor issue, feature request. Judge impact, not tone. | When torn between two priorities, choose the higher one.
+P3 = how-to, minor issue, feature request. Judge impact, not tone. When torn between two priorities, choose the higher one.
 
 product_area: account_admin | invoicing | payments | bank_feeds | data_import | reports_exports | api_webhooks | general (app-wide, subscription, or unclear).
 
@@ -24,7 +24,7 @@ When in doubt, "no". A confident wrong answer is worse than routing to a human.
 
 confidence_score: your probability that all four fields are correct. Use below 0.8 for vague, multi-issue or borderline tickets.
 
-The knowledge base covers these sections:
+Knowledge base (full text):
 {kb_index}"""
 
 DRAFT_SYSTEM = """You write customer replies for Northwind Books Support using ONLY the KB excerpts provided.
