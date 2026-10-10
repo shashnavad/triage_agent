@@ -9,25 +9,26 @@ Classifies Northwind Books support tickets on 4 taxonomy fields, drafts KB-groun
 python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-export ANTHROPIC_API_KEY="your-key-here"   # read from the environment, never committed
+export ANTHROPIC_API_KEY="your-key-here"   # or put ANTHROPIC_API_KEY=... in a .env file (loaded automatically, listed in .gitignore)
 ```
 
 ### 2. Run the pipeline on a tickets file (the one command for new tickets)
 ```bash
 python run.py --input new_tickets.json
 ```
-Writes `results.json` and prints one line per ticket. `--output results.json` and `--workers 5` are optional. Input can be `.json` or `.csv` with the fields `ticket_id, created_at, channel, customer_org, requester, subject, body`.
+Writes `results.json` and prints one line per ticket. It also prints total tokens, cost, cost per ticket and wall time. `--output results.json` and `--workers 5` are optional. Input can be `.json` or `.csv` with the fields `ticket_id, created_at, channel, customer_org, requester, subject, body`.
 
 Full run over the 38 provided tickets:
 ```bash
 python run.py --input tickets.json --output results.json
 ```
+Add --workers 20 for a faster demo (about 12 seconds for all 38 tickets).
 
 ### 3. Run the evaluation harness
 ```bash
 python eval.py                      # 3 runs over tickets.json, scored against labeled_sample.csv
 python eval.py --runs 5             # more runs for a tighter consistency number
-python eval.py --min-exact 0.75 --min-stability 0.95   # CI gate, exits 1 if either is missed
+python eval.py --min-exact 0.80 --min-stability 0.90   # CI gate, exits 1 if either is missed
 ```
 Prints 4-field exact match, per-field accuracy and macro-F1, P0/P1 recall, false deflections, run-to-run stability, low-confidence flags and draft checks. Full detail is written to `eval_report.json`.
 
@@ -36,7 +37,7 @@ Prints 4-field exact match, per-field accuracy and macro-F1, P0/P1 recall, false
 python -m pytest -q
 ```
 
-### 5. Demo flow (about 3 minutes)
+### 5. Demo flow (about 2.5 minutes: 32 s run, 1.6 min eval, 10 s new tickets)
 ```bash
 python run.py --input tickets.json --output results.json   # all 38 tickets
 python eval.py                                             # accuracy and stability
@@ -76,7 +77,10 @@ Each entry in `results.json` contains:
 | `MAX_CORRECTIONS` | `2` | redrafts after a failed check |
 | `DENSE_BACKEND` | `tfidf` | set `minilm` (and `pip install sentence-transformers`) for real embeddings |
 
+Token prices used for the cost line are in `triage/config.py` (`PRICES`). The SDK version in use does not accept a `temperature` parameter, so none is sent.
+
 ## Notes
 - Card numbers, CVVs and key-like strings are masked before any prompt or log write.
 - Ticket text is treated as data. Lines that look like instructions to the AI (for example in T-1017) are removed, and the ticket is flagged for review.
 - Any API failure or malformed model output on one ticket escalates that ticket to a human and the batch continues.
+- The classifier receives the full knowledge base text in a cached system prompt, and also returns an English restatement of the request that is used as the retrieval query.

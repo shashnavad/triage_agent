@@ -95,7 +95,8 @@ def main() -> int:
         print(f"run {i + 1}/{args.runs} over {len(tickets)} tickets ...", flush=True)
         runs.append(run_tickets(graph, tickets))
 
-    metrics = classification_metrics(runs[0], labels)
+    per_run = [classification_metrics(r, labels) for r in runs]
+    metrics = per_run[0]
     stab = consistency(runs)
     quality = review_and_draft_quality(runs[0], labels, metrics)
     report = {"classification": metrics, "consistency": stab, "review_and_drafts": quality}
@@ -107,6 +108,8 @@ def main() -> int:
         print(f"  {f:<13} acc {metrics['per_field_accuracy'][f]:.0%}   macro-F1 {metrics['per_field_macro_f1'][f]:.2f}")
     print(f"  P0/P1 recall        : {metrics['p0_p1_recall']}   downgrades: {metrics['priority_downgrades'] or 'none'}")
     print(f"  false deflections   : {metrics['false_deflections'] or 'none'}")
+    print(f"  per run exact match {[round(m['exact_match'], 2) for m in per_run]}, "
+          f"P0/P1 recall {[round(m['p0_p1_recall'], 2) for m in per_run]}")
     for tid, diff in metrics["mismatches"].items():
         print(f"  mismatch {tid}: {diff}")
     print(f"\nCONSISTENCY over {args.runs} runs: stability {stab['stability']:.1%}, "

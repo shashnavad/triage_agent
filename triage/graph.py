@@ -38,7 +38,7 @@ def policy_reasons(s: dict) -> list[str]:
     """Pure routing rules. Any reason returned sends the ticket to a human."""
     reasons = []
     if s.get("classification_failed"):
-        return ["classification failed, needs manual triage"]
+        return [s["classification_reasoning"]]
     if s["confidence_score"] < config.CONF_THRESHOLD:
         reasons.append(f"low confidence ({s['confidence_score']:.2f} < {config.CONF_THRESHOLD})")
     if s["model_deflectable"] == "no":
@@ -67,8 +67,8 @@ def build_graph(llm, retriever):
         except Exception as e:  # API failure or malformed output after retry
             return {"classification_failed": True, "category": "other", "priority": "P2", "product_area": "general",
                     "model_deflectable": "no", "confidence_score": 0.0,
-                    "classification_reasoning": f"classification error: {type(e).__name__}",
-                    "english_query": "", "audit_trail": [f"classify: failed ({type(e).__name__})"]}
+                    "classification_reasoning": f"classification error: {type(e).__name__}: {str(e)[:200]}",
+                    "english_query": "", "audit_trail": [f"classify: failed ({type(e).__name__}: {str(e)[:200]})"]}
         return {"category": r.category, "priority": r.priority, "product_area": r.product_area,
                 "model_deflectable": r.deflectable, "confidence_score": r.confidence_score,
                 "classification_reasoning": r.reasoning, "english_query": r.english_query,
@@ -105,7 +105,7 @@ def build_graph(llm, retriever):
         issues = guardrails.check_output(state["draft_response"])
         if not issues:
             try:
-                v = llm.structured(config.DRAFT_MODEL, CriticVerdict, prompts.CRITIC_SYSTEM,
+                v = llm.structured(config.CLASSIFIER_MODEL, CriticVerdict, prompts.CRITIC_SYSTEM,
                                    prompts.critic_user(state["retrieved_chunks"], state["sanitized_text"], state["draft_response"]))
                 if not (v.grounded and v.safe):
                     issues = v.issues or ["critic rejected the draft"]

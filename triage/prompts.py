@@ -9,11 +9,11 @@ data_issue (a specific record or result looks wrong or missing, needs investigat
 access_account (login, password, 2FA, SSO, team members, roles) |
 billing_contract (their own Northwind subscription: charges, plans, contract) | feature_request (asks for something the product does not do) |
 security_privacy (possible data exposure, privacy or deletion requests, security concerns) | other (does not fit, or too vague).
-With several requests, classify by the most urgent one.
+With several requests, classify by the most urgent one. | Login, password, 2FA, SSO, team member and role questions are access_account even when phrased as how-to.
 
 priority: P0 = app unavailable or a security/privacy incident | P1 = core workflow blocked with financial, legal or hard-deadline impact
 (payroll, tax filing) and no workaround | P2 = not working as expected, data issue or billing question, workaround exists or limited impact |
-P3 = how-to, minor issue, feature request. Judge impact, not tone.
+P3 = how-to, minor issue, feature request. Judge impact, not tone. | When torn between two priorities, choose the higher one.
 
 product_area: account_admin | invoicing | payments | bank_feeds | data_import | reports_exports | api_webhooks | general (app-wide, subscription, or unclear).
 

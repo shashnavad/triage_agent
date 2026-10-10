@@ -2,7 +2,7 @@
 
 **Document Status:** Final Architecture Specification (`SYSTEM_DESIGN.md`)
 
-**Target Execution Framework:** Python 3.11+, Anthropic Claude API (`claude-3-5-haiku` / `claude-3-5-sonnet`), LangGraph / StateGraph Engine
+**Target Execution Framework:** Python 3.11+, Anthropic Claude API (`claude-haiku-5-5` / `claude-sonnet-5-5`), LangGraph / StateGraph Engine
 
 **Hardware Constraint:** 8 GB Local Host RAM
 
@@ -29,7 +29,7 @@ The system is structured as a deterministic **External State Graph** that decoup
                                           ▼
                          ┌─────────────────────────────────┐
                          │  2. Ticket Classifier Node      │
-                         │ (Claude 3.5 Haiku + Tool Use)   │
+                         │ Claude Haiku 5.5 + Tool Use     │
                          └────────────────┬────────────────┘
                                           │
                                           ▼
@@ -105,7 +105,7 @@ class AgentState(TypedDict):
 
 ## 2. LLM Provider & Model Selection (Claude Architecture)
 
-To satisfy the explicit requirement for Claude models while maintaining sub-second performance, the pipeline adopts a **Tiered Anthropic Model Strategy**:
+To satisfy the explicit requirement for Claude models while keeping per-ticket cost and latency low, the pipeline adopts a **Tiered Anthropic Model Strategy**:
 
 ```
                   ┌─────────────────────────────────────────┐
@@ -120,21 +120,21 @@ To satisfy the explicit requirement for Claude models while maintaining sub-seco
         - Injection Guardrail Pass            - Self-Correction Pass
                     │                                     │
                     ▼                                     ▼
-      Claude 3.5 Haiku (20241022)           Claude 3.5 Sonnet (20241022)
+            Claude Haiku 5.5                       Claude Sonnet 5.5
       High Throughput / Low Latency         Deep Reasoning & Instruction Following
 
 ```
 
-1. **Classification Node (Claude 3.5 Haiku)**:
-* **Model**: `claude-3-5-haiku-20241022`
-* **Role**: Runs structured classification over all 4 taxonomy fields (`category`, `priority`, `product_area`, `deflectable`).
+1. **Classification Node (Claude Haiku 5.5)**:
+* **Model**: `claude-haiku-5-5`
+* **Role**: Runs structured classification over all 4 taxonomy fields (`category`, `priority`, `product_area`, `deflectable`). The classifier sees the full KB text so it can judge whether a ticket is fully answerable, and returns an English restatement of the request for retrieval.
 
 
-* **Rationale**: Haiku provides near-instant response times and precision when handling structured JSON tool calls, keeping classification cost under $0.0005 per ticket.
+* **Rationale**: Haiku provides near-instant response times and precision when handling structured JSON tool calls, with the full KB text in a cached system prompt, keeping classification to a fraction of a cent per ticket.
 
 
-2. **Draft Response & Verification Node (Claude 3.5 Sonnet)**:
-* **Model**: `claude-3-5-sonnet-20241022`
+2. **Draft Response & Verification Node (Claude Sonnet 5.5)**:
+* **Model**: `claude-sonnet-5-5`
 * **Role**: Generates grounded customer replies for deflectable tickets and evaluates self-correction passes.
 
 
@@ -286,8 +286,8 @@ For tickets marked `deflectable = "yes"`, a ReAct (Reasoning + Acting) execution
 
 ```
    ┌──────────────────────────────────────────────────────────┐
-   │ 1. THOUGHT Pass (Claude 3.5 Sonnet)                      │
-   │ "User asks how to clear a duplicate alert. KB 04 states   │
+   │ 1. THOUGHT Pass (Claude Sonnet 5.5)                      │
+   │ "User asks how to clear a duplicate alert. KB 04 states  │
    │  Dismiss -> Not a duplicate requires a reason."          │
    └────────────────────────────┬─────────────────────────────┘
                                 │
@@ -327,7 +327,7 @@ For tickets marked `deflectable = "yes"`, a ReAct (Reasoning + Acting) execution
 | **Classification Accuracy** | **Superior** out-of-the-box reasoning on complex edge cases | Risk of overfitting on a 12-ticket labeled dataset
 
  |
-| **Maintenance Cost** | Pay-per-token API cost (~$0.02 for 38 tickets) | Infrastructure maintenance, GPU hosting fees |
+| **Maintenance Cost** | Pay-per-token API cost (~$0.08 for 38 tickets (measured)) | Infrastructure maintenance, GPU hosting fees |
 
 *Decision*: Using Anthropic's Claude API avoids the need for local fine-tuning (LoRA/QLoRA), remaining well within the **4–6 hour implementation time-box** and the **8 GB RAM constraint**.
 
@@ -353,12 +353,12 @@ Evaluates system predictions against the ground truth labels in `labeled_sample.
 
 ### 2. Consistency Testing
 
-Runs $N = 3$ repeated iterations across the sample dataset at `temperature = 0.0`:
+Runs $N = 3$ repeated iterations across the sample dataset with default sampling (the current SDK does not accept a temperature parameter):
 
 * **Classification Stability Rate**: Measures consistency of taxonomy outputs across repeated runs.
 
 
-* Target: $> 95\%$ stability across run iterations.
+* Target: $> 95\%$ stability. Measured: 92.1% to 96.5%. Differences are borderline priority or category flips, plus rare deflect-or-human flips that fail safe.
 
 ### 3. Low-Confidence & Routing Heuristics
 
@@ -399,10 +399,9 @@ For generated draft responses, an automated critic checks:
 
  | 10x Volume (380 Tickets) | 100x Volume (3,800 Tickets) |
 | --- | --- | --- | --- |
-| **Pipeline Latency** | ~25 seconds (Sequential) | ~18 seconds (Async Pool, `c=10`) | ~2.5 minutes (Worker Pool) |
-| **Estimated Cost** | ~$0.02 USD | ~$0.20 USD | ~$2.00 USD |
-| **RAM Footprint** | **~120 MB** | **~180 MB** | **~250 MB** |
-| **API Token Spend** | ~45,000 Tokens | ~450,000 Tokens | ~4.5M Tokens |
+| **Pipeline Latency** | ~32 s (measured, 5 workers), ~11.5 s (measured, 20 workers) | ~5 min at 5 workers, ~2 min at 20 | ~53 min at 5 workers, ~19 min at 20 |
+| **Estimated Cost** | ~$0.08 USD (measured) | ~$0.83 USD | ~$8.25 USD |
+| **API Token Spend** | ~342,000 tokens (measured) | ~3.4M tokens | ~34M tokens |
 
 ### System Bottlenecks & Production Mitigation Strategies
 
@@ -450,7 +449,7 @@ For generated draft responses, an automated critic checks:
 ├────────────────────────────────────────────────────────────────────────┤
 │ HOUR 3: LangGraph State Machine & Anthropic Integration                │
 │ - Implement Input Guardrails (sanitizer & prompt isolation)            │
-│ - Integrate Claude 3.5 Haiku classification & Claude 3.5 Sonnet draft  │
+│ - Integrate Claude 5.5 Haiku classification & Claude 5.5 Sonnet draft  │
 ├────────────────────────────────────────────────────────────────────────┤
 │ HOUR 4: Evaluation Harness Implementation                              │
 │ - Build eval.py comparing predictions to labeled_sample.csv            │

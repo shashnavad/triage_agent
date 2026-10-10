@@ -64,8 +64,7 @@ class HybridRetriever:
         self.dense = _make_dense(texts)
 
     def index_text(self) -> str:
-        """Compact list of what the KB covers, shown to the classifier to judge deflectability."""
-        return "\n".join(f"- {c['heading']}" for c in self.chunks)
+        return "\n\n".join(c["text"] for c in self.chunks)
 
     def search(self, query: str, k: int = 3) -> list[dict]:
         fused: dict[int, float] = {}
