@@ -2,6 +2,9 @@
 
 Classifies Northwind Books support tickets on 4 taxonomy fields, drafts KB-grounded replies for deflectable tickets, and routes everything else to a human with a reason. Design details are in `SYSTEM_DESIGN.md`, tradeoffs and scaling notes in `WRITEUP.md`.
 
+## Architecture in brief
+guard (mask PII, strip injections) -> classify (Haiku, forced tool use, sees full KB) -> policy router (confidence and category rules) -> retrieve (BM25 + vector, RRF) -> draft (Sonnet) <-> verify (rule check + critic, max 2 corrections) -> auto_draft or human with a reason. Full design in `SYSTEM_DESIGN.md`.
+
 ## Commands to Use and Start
 
 ### 1. One-time setup
@@ -66,6 +69,10 @@ Each entry in `results.json` contains:
 - `escalation_reason` for every ticket routed to a human
 - `draft_response` and `kb_sources` for drafted tickets
 - `audit_trail` with each step the ticket took
+
+## Evaluation approach
+- **Low confidence:** a ticket is flagged for review when the model's own confidence is below 0.80, when a policy override applies (P0/P1, bug, data issue, security, billing, feature request), or when an injection or card data is detected. 0.80 is a conservative default, not a tuned value. At most one labeled ticket falls below it, so the 12-label sample cannot validate it. In production I would calibrate it against human overrides.
+- **Draft quality:** every draft must pass a rule check (no card data, no promised actions) and an LLM critic that verifies each claim against the KB excerpts, with up to 2 corrections before escalation. There is no human-labeled reply set, so the harness reports drafts produced, how many needed a correction, and rule violations (0 across eval runs). In production a human would approve every draft before it is sent.
 
 ## Configuration (environment variables, all optional)
 | Variable | Default | Purpose |

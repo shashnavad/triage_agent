@@ -5,6 +5,8 @@ The goal is to remove the human touch from tickets that are pure knowledge base 
 
 **Latest eval (3 runs):** 4-field exact match 83% (10 of 12) in every run, P0/P1 recall 100% in every run, 0 false deflections, stability 94.7% (92% to 97% across eval runs). In run 1, product area and deflectable are 100% accurate and priority is 100%. All misses are category on two ambiguous labels (T-1004, T-1014).
 
+Low confidence means model confidence below 0.80, a policy override, or an injection or card-data flag. The threshold is untuned, and draft quality is checked by a critic pass plus rule checks (details in README).
+
 ## Architecture and why
 A deterministic LangGraph state graph, not a free-form agent, so every ticket has an auditable path:
 
