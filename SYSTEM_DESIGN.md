@@ -318,16 +318,12 @@ For tickets marked `deflectable = "yes"`, a ReAct (Reasoning + Acting) execution
 
 ### E. Model Fine-Tuning (LoRA / QLoRA) Tradeoff Analysis
 
-| Metric / Dimension | Cloud Claude API (Selected) | LoRA / QLoRA Fine-Tuned Local Model
-
- |
+| Metric / Dimension | Cloud Claude API (Selected) | LoRA / QLoRA Fine-Tuned Local Model |
 | --- | --- | --- |
-| **Setup Overhead** | **$< 15$ mins** (Prompt engineering + API keys) | **$12+$ hours** (Dataset formatting, hyperparameter tuning) |
-| **Hardware Requirement** | **$< 200$ MB RAM** (Fits within 8 GB host) | **Requires high VRAM GPUs** (e.g., A10G/A100 for training) |
-| **Classification Accuracy** | **Superior** out-of-the-box reasoning on complex edge cases | Risk of overfitting on a 12-ticket labeled dataset
-
- |
-| **Maintenance Cost** | Pay-per-token API cost (~$0.08 for 38 tickets (measured)) | Infrastructure maintenance, GPU hosting fees |
+| Setup Overhead | <15 mins (Prompt engineering + API keys) | 12+ hours (Dataset formatting, hyperparameter tuning) |
+| Hardware Requirement | No GPU, light enough for an 8 GB host | Requires high VRAM GPUs (e.g., A10G/A100 for training) |
+| Classification Accuracy | Superior out-of-the-box reasoning on complex edge cases | Risk of overfitting on a 12-ticket labeled dataset |
+| Maintenance Cost | Pay-per-token API cost (~$0.08 for 38 tickets, measured) | Infrastructure maintenance, GPU hosting fees |
 
 *Decision*: Using Anthropic's Claude API avoids the need for local fine-tuning (LoRA/QLoRA), remaining well within the **4–6 hour implementation time-box** and the **8 GB RAM constraint**.
 
@@ -395,13 +391,11 @@ For generated draft responses, an automated critic checks:
 
 ### Performance & Cost Metrics
 
-| Execution Metric | Baseline (38 Tickets)
-
- | 10x Volume (380 Tickets) | 100x Volume (3,800 Tickets) |
+| Execution Metric | Baseline (38 Tickets) | 10x Volume (380 Tickets) | 100x Volume (3,800 Tickets) |
 | --- | --- | --- | --- |
-| **Pipeline Latency** | ~32 s (measured, 5 workers), ~11.5 s (measured, 20 workers) | ~5 min at 5 workers, ~2 min at 20 | ~53 min at 5 workers, ~19 min at 20 |
-| **Estimated Cost** | ~$0.08 USD (measured) | ~$0.83 USD | ~$8.25 USD |
-| **API Token Spend** | ~342,000 tokens (measured) | ~3.4M tokens | ~34M tokens |
+| Pipeline Latency | ~32 s (measured, 5 workers), ~11.5 s (measured, 20 workers) | ~5 min at 5 workers, ~2 min at 20 | ~53 min at 5 workers, ~19 min at 20 |
+| Estimated Cost | ~$0.08 USD (measured) | ~$0.83 USD | ~$8.25 USD |
+| API Token Spend | ~342,000 tokens (measured) | ~3.4M tokens | ~34M tokens |
 
 ### System Bottlenecks & Production Mitigation Strategies
 
