@@ -167,7 +167,7 @@ Running on host environments constrained to **8 GB RAM** requires strict offload
 ```
 
 * **Zero Local LLM Overhead**: Offloading generation and classification to the Anthropic Claude API eliminates the requirement for local GGUF/llama.cpp processes (which consume 4–6 GB VRAM/RAM).
-* **Lightweight Embedding Engine**: The dense vector store uses `sentence-transformers/all-MiniLM-L6-v2` (~80 MB RAM footprint) or delegates embedding generation to `Voyage AI` / `OpenAI text-embedding-3-small` via API.
+* **Lightweight Embedding Engine**: The retriever's second ranker defaults to a character n-gram TF-IDF index (`DENSE_BACKEND=tfidf`), which needs no model download. An optional MiniLM backend (`sentence-transformers/all-MiniLM-L6-v2`, model weights roughly 80 MB) is available via `DENSE_BACKEND=minilm`. Hosted embeddings (`Voyage AI` or `OpenAI text-embedding-3-small`) are future options and are not implemented.
 * **In-Memory KB Indexing**: The Northwind Books Knowledge Base comprises 8 short Markdown files (~25 KB total). Indexing all 8 articles into an in-memory BM25 index (`rank_bm25`) and dense vector array requires less than **35 MB RAM**.
 
 
