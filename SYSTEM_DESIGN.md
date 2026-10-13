@@ -12,7 +12,7 @@
 
 ## 1. High-Level Architecture & State Graph Flow
 
-The system is structured as a deterministic **External State Graph** that decouples orchestration, tool invocation, and LLM reasoning. The design isolates untrusted user inputs, enforces strict schema adherence via Anthropic Tool Use, and controls transitions based on evaluated confidence and policy constraints.
+The system is structured as an in-memory **LangGraph state machine** that decouples workflow routing, retrieval, and LLM reasoning. The design isolates untrusted user inputs, enforces strict schema adherence via Anthropic Tool Use, and controls transitions based on evaluated confidence and policy constraints.
 
 ```
                          ┌─────────────────────────────────┐
