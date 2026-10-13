@@ -358,11 +358,16 @@ Target: $> 95\%$ stability. Measured: 92.1% to 96.5% across eval runs (latest 94
 
 ### 3. Low-Confidence & Routing Heuristics
 
-Tickets are flagged for human review (`deflectable = "no"`) if any of the following triggers fire:
+Tickets are routed to a human (`deflectable = "no"`) if any of the following triggers fire. Model-reported confidence is poorly calibrated, so it is one signal among several and policy rules do not depend on it:
 
-1. **Low Confidence Score**: Model-predicted confidence $< 0.80$.
-2. **Policy Violation Mismatch**:
-* Ticket classified as `bug_defect` or `data_issue`, but marked `deflectable = "yes"` (violates policy rule requiring human investigation).
+1. **Classification failure:** API error or malformed output after one retry.
+2. **Low confidence:** model-reported confidence < 0.80.
+3. **Model says not deflectable.**
+4. **Policy override:** the model says `deflectable = "yes"`, but the category is `bug_defect`, `data_issue`, `security_privacy`, `billing_contract` or `feature_request`, or the priority is `P0` or `P1`. These always need a human, whatever the confidence.
+5. **Retrieval deficit:** no KB chunk matches, or the RRF score of the top-1 chunk is < 0.015 (the query is not adequately answered in `kb/`).
+6. **Draft failure:** the critic or rule check still fails after 2 corrections, the drafter returns `INSUFFICIENT_CONTEXT`, or an API error occurs during drafting or verification.
+
+Injection patterns and card data do not force a human route. They set `needs_human_review` flags (`possible_prompt_injection`, `sensitive_data_in_ticket`), and the ticket may still receive a draft. Run-to-run stability is measured separately in the eval harness.
 
 
 * Ticket classified as `P0` or `P1`, but marked `deflectable = "yes"`.
