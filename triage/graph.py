@@ -32,6 +32,8 @@ class AgentState(TypedDict, total=False):
     route: str
     escalation_reasons: Annotated[list, operator.add]
     audit_trail: Annotated[list, operator.add]
+    redactions: dict
+    safe_subject:str
 
 
 def policy_reasons(s: dict) -> list[str]:
@@ -58,8 +60,14 @@ def build_graph(llm, retriever):
         g = guardrails.sanitize(f"Subject: {t.get('subject', '')}\n\n{t.get('body', '')}")
         trail = [f"guard: injection={g['injection_flagged']} sensitive={g['sensitive_flagged']}"]
         return {"sanitized_text": g["text"], "injection_flagged": g["injection_flagged"],
-                "sensitive_flagged": g["sensitive_flagged"], "audit_trail": trail}
+                "sensitive_flagged": g["sensitive_flagged"], "audit_trail": trail, "redactions": g["redactions"]}
 
+    def minimize(state):
+        t = state["raw_ticket"]
+        safe = {"ticket_id": t["ticket_id"], "channel": t.get("channel","")}
+        subject = guardrails.sanitize(t.get("subject",""))["text"]
+        return {"raw_ticket": safe, "safe_subject": subject, "audit_trail": ["minimize: raw subject and body dropped from state"]}
+    
     def classify(state):
         user = prompts.ticket_block(state["raw_ticket"].get("channel", ""), state["sanitized_text"])
         try:
@@ -127,11 +135,12 @@ def build_graph(llm, retriever):
 
     g = StateGraph(AgentState)
     for name, fn in [("guard", guard), ("classify", classify), ("policy", policy), ("retrieve", retrieve),
-                     ("draft", draft), ("verify", verify), ("finalize", finalize), ("escalate", escalate)]:
+                     ("draft", draft), ("verify", verify), ("finalize", finalize), ("escalate", escalate), ("minimize", minimize)]:
         g.add_node(name, fn)
     has_reasons = lambda s: bool(s.get("escalation_reasons"))
     g.add_edge(START, "guard")
-    g.add_edge("guard", "classify")
+    g.add_edge("guard", "minimize")
+    g.add_edge("minimize", "classify")
     g.add_edge("classify", "policy")
     g.add_conditional_edges("policy", lambda s: "escalate" if has_reasons(s) else "retrieve")
     g.add_conditional_edges("retrieve", lambda s: "escalate" if has_reasons(s) else "draft")

@@ -5,6 +5,7 @@ CARD = re.compile(r"\b(?:\d[ -]?){13,19}\b")
 CVV = re.compile(r"(?i)\b(?:cvv|cvc|cid)\b\W{0,3}\d{3,4}")
 EXPIRY = re.compile(r"(?i)\bexp(?:iry|iration)?(?:\s*date)?\W{0,3}\d{1,2}\s*/\s*\d{2,4}")
 SECRET = re.compile(r"(?i)\b(?:(?:sk|pk|key|api)[-_][A-Za-z0-9_\-]{16,}|bearer\s+[A-Za-z0-9._\-]{20,})")
+SSN = re.compile(r"\b\d{3}-\d{2}-\d{4}\b")
 
 INJECTION = [re.compile(p, re.I) for p in (
     r"\bsystem note\b",
@@ -54,6 +55,7 @@ def sanitize(text: str) -> dict:
     text, n_cvv = CVV.subn("[REDACTED_PAYMENT_DATA]", text)
     text, n_exp = EXPIRY.subn("[REDACTED_PAYMENT_DATA]", text)
     text, n_secret = SECRET.subn("[REDACTED_SECRET]", text)
+    text, n_ssn = SSN.subn("[REDACTED_ID]", text)
 
     kept, injected = [], False
     for line in text.splitlines():
@@ -66,6 +68,7 @@ def sanitize(text: str) -> dict:
         "text": "\n".join(kept).strip(),
         "injection_flagged": injected,
         "sensitive_flagged": bool(card or n_cvv or n_exp or n_secret),
+        "redactions":{"payment": int(card) +n_cvv + n_exp, "secret": n_secret, "id_number": n_ssn},
     }
 
 

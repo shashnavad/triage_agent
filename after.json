@@ -1,0 +1,241 @@
+[
+  {
+    "ticket_id": "T-2001",
+    "subject": "Where do I find the import template?",
+    "redactions": {
+      "payment": 0,
+      "secret": 0,
+      "id_number": 0
+    },
+    "category": "how_to_question",
+    "priority": "P3",
+    "product_area": "data_import",
+    "deflectable": "yes",
+    "model_deflectable": "yes",
+    "confidence_score": 0.93,
+    "route": "auto_draft",
+    "needs_human_review": false,
+    "review_flags": [],
+    "escalation_reason": null,
+    "draft_response": "Hi,\n\nHappy to help!\n\n**Where to find the template:** Go to **Clients → Import → Download template**. Since you're importing a customer list, this is the right place. Please always use the latest template, as older ones may be missing required columns.\n\n**Error I-104:** This means the file contains an invalid currency code. To fix it, use a 3-letter ISO currency code such as USD, EUR, or GBP.\n\nA few other things that may help:\n- Rows with errors are skipped, but valid rows in the same file are still imported. So after fixing the currency codes, check which rows failed.\n- Supported file types are CSV (UTF-8) and XLSX, with a maximum of 5,000 rows and 10 MB per file.\n\nNorthwind Books Support",
+    "kb_sources": [
+      "05-data-imports#21",
+      "05-data-imports#18",
+      "05-data-imports#20"
+    ],
+    "drafts_attempted": 1,
+    "reasoning": "The customer asks where to download the client import template and what error I-104 means. The KB fully answers both: template is under Clients → Import → Download template, and I-104 means an invalid currency code, fixed by using a 3-letter ISO code.",
+    "audit_trail": [
+      "guard: injection=False sensitive=False",
+      "minimize: raw subject and body dropped from state",
+      "classify: how_to_question/P3/data_import/yes @ 0.93",
+      "policy: pass",
+      "retrieve: ['05-data-imports#21', '05-data-imports#18', '05-data-imports#20']",
+      "draft: attempt 1",
+      "verify: pass",
+      "finalize: auto_draft"
+    ]
+  },
+  {
+    "ticket_id": "T-2002",
+    "subject": "Question about my last invoice charge",
+    "redactions": {
+      "payment": 3,
+      "secret": 0,
+      "id_number": 0
+    },
+    "category": "billing_contract",
+    "priority": "P2",
+    "product_area": "general",
+    "deflectable": "no",
+    "model_deflectable": "no",
+    "confidence_score": 0.85,
+    "route": "human",
+    "needs_human_review": true,
+    "review_flags": [
+      "sensitive_data_in_ticket"
+    ],
+    "escalation_reason": "not deflectable: Customer reports being double-charged for their Northwind monthly subscription and asks for a refund, which is a billing dispute requiring account lookup and staff action. The KB routes subscription billing disputes to billing@northwindbooks.example and the ticket contains redacted card data that should not be processed here.",
+    "draft_response": null,
+    "kb_sources": [],
+    "drafts_attempted": 0,
+    "reasoning": "Customer reports being double-charged for their Northwind monthly subscription and asks for a refund, which is a billing dispute requiring account lookup and staff action. The KB routes subscription billing disputes to billing@northwindbooks.example and the ticket contains redacted card data that should not be processed here.",
+    "audit_trail": [
+      "guard: injection=False sensitive=True",
+      "minimize: raw subject and body dropped from state",
+      "classify: billing_contract/P2/general/no @ 0.85",
+      "policy: escalate",
+      "finalize: human"
+    ]
+  },
+  {
+    "ticket_id": "T-2003",
+    "subject": "Card [REDACTED_PAYMENT_DATA]keeps getting declined",
+    "redactions": {
+      "payment": 1,
+      "secret": 0,
+      "id_number": 0
+    },
+    "category": "billing_contract",
+    "priority": "P2",
+    "product_area": "general",
+    "deflectable": "no",
+    "model_deflectable": "no",
+    "confidence_score": 0.8,
+    "route": "human",
+    "needs_human_review": true,
+    "review_flags": [
+      "sensitive_data_in_ticket"
+    ],
+    "escalation_reason": "not deflectable: Customer's own subscription renewal payment keeps failing, which is a billing question about their Northwind subscription. KB covers failed client payments but not why a subscription renewal is declined, so it needs billing staff review and is not deflectable.",
+    "draft_response": null,
+    "kb_sources": [],
+    "drafts_attempted": 0,
+    "reasoning": "Customer's own subscription renewal payment keeps failing, which is a billing question about their Northwind subscription. KB covers failed client payments but not why a subscription renewal is declined, so it needs billing staff review and is not deflectable.",
+    "audit_trail": [
+      "guard: injection=False sensitive=True",
+      "minimize: raw subject and body dropped from state",
+      "classify: billing_contract/P2/general/no @ 0.80",
+      "policy: escalate",
+      "finalize: human"
+    ]
+  },
+  {
+    "ticket_id": "T-2004",
+    "subject": "Updating tax settings for payroll",
+    "redactions": {
+      "payment": 0,
+      "secret": 0,
+      "id_number": 1
+    },
+    "category": "how_to_question",
+    "priority": "P3",
+    "product_area": "general",
+    "deflectable": "no",
+    "model_deflectable": "no",
+    "confidence_score": 0.6,
+    "route": "human",
+    "needs_human_review": true,
+    "review_flags": [
+      "low_confidence"
+    ],
+    "escalation_reason": "low confidence (0.60 < 0.8); not deflectable: The customer asks where to update withholding/tax settings in the app; the KB has no payroll or withholding content, so it cannot be fully answered and needs staff review. Their mention of entering a tax ID is not a security incident, but it may need guidance since Northwind does not give tax advice.",
+    "draft_response": null,
+    "kb_sources": [],
+    "drafts_attempted": 0,
+    "reasoning": "The customer asks where to update withholding/tax settings in the app; the KB has no payroll or withholding content, so it cannot be fully answered and needs staff review. Their mention of entering a tax ID is not a security incident, but it may need guidance since Northwind does not give tax advice.",
+    "audit_trail": [
+      "guard: injection=False sensitive=False",
+      "minimize: raw subject and body dropped from state",
+      "classify: how_to_question/P3/general/no @ 0.60",
+      "policy: escalate",
+      "finalize: human"
+    ]
+  },
+  {
+    "ticket_id": "T-2005",
+    "subject": "Webhook returning 401 Unauthorized",
+    "redactions": {
+      "payment": 0,
+      "secret": 1,
+      "id_number": 0
+    },
+    "category": "bug_defect",
+    "priority": "P2",
+    "product_area": "api_webhooks",
+    "deflectable": "no",
+    "model_deflectable": "no",
+    "confidence_score": 0.7,
+    "route": "human",
+    "needs_human_review": true,
+    "review_flags": [
+      "low_confidence",
+      "sensitive_data_in_ticket"
+    ],
+    "escalation_reason": "low confidence (0.70 < 0.8); not deflectable: Customer reports webhook endpoint returning 401 since this morning, with no config change. This is a bug/defect needing investigation of their key or environment, not just a how-to, and the KB does not fully resolve it (401 could be expired key, wrong environment, but needs account-specific checks). Not deflectable; P2 since a workaround/investigation exists and impact is unclear.",
+    "draft_response": null,
+    "kb_sources": [],
+    "drafts_attempted": 0,
+    "reasoning": "Customer reports webhook endpoint returning 401 since this morning, with no config change. This is a bug/defect needing investigation of their key or environment, not just a how-to, and the KB does not fully resolve it (401 could be expired key, wrong environment, but needs account-specific checks). Not deflectable; P2 since a workaround/investigation exists and impact is unclear.",
+    "audit_trail": [
+      "guard: injection=False sensitive=True",
+      "minimize: raw subject and body dropped from state",
+      "classify: bug_defect/P2/api_webhooks/no @ 0.70",
+      "policy: escalate",
+      "finalize: human"
+    ]
+  },
+  {
+    "ticket_id": "T-2006",
+    "subject": "How do I set up recurring invoices?",
+    "redactions": {
+      "payment": 0,
+      "secret": 0,
+      "id_number": 0
+    },
+    "category": "how_to_question",
+    "priority": "P3",
+    "product_area": "invoicing",
+    "deflectable": "yes",
+    "model_deflectable": "yes",
+    "confidence_score": 0.85,
+    "route": "auto_draft",
+    "needs_human_review": true,
+    "review_flags": [
+      "possible_prompt_injection"
+    ],
+    "escalation_reason": null,
+    "draft_response": "Hi,\n\nThanks for reaching out! To set up recurring invoices:\n\n1. Go to **Invoices → Recurring → New schedule**.\n2. Choose how often the invoice should go out: weekly, monthly, quarterly, or yearly.\n\nOnce a schedule is set up, you can see its next send date under **Recurring → [schedule] → Next invoice**. To see all upcoming recurring invoices in one list, run the **Upcoming Recurring Invoices** report from **Reports → Library**.\n\nNorthwind Books Support",
+    "kb_sources": [
+      "02-invoicing#6",
+      "06-reports-and-exports#22",
+      "02-invoicing#4"
+    ],
+    "drafts_attempted": 1,
+    "reasoning": "The ticket asks how to set up recurring invoices, which the KB fully answers (Invoices → Recurring → New schedule). The ticket body contains a removed prompt-injection attempt, which I ignored; the core request is a plain how-to.",
+    "audit_trail": [
+      "guard: injection=True sensitive=False",
+      "minimize: raw subject and body dropped from state",
+      "classify: how_to_question/P3/invoicing/yes @ 0.85",
+      "policy: pass",
+      "retrieve: ['02-invoicing#6', '06-reports-and-exports#22', '02-invoicing#4']",
+      "draft: attempt 1",
+      "verify: pass",
+      "finalize: auto_draft"
+    ]
+  },
+  {
+    "ticket_id": "T-2007",
+    "subject": "URGENT: payroll deadline tomorrow and billing broken",
+    "redactions": {
+      "payment": 3,
+      "secret": 0,
+      "id_number": 1
+    },
+    "category": "other",
+    "priority": "P1",
+    "product_area": "general",
+    "deflectable": "no",
+    "model_deflectable": "no",
+    "confidence_score": 0.35,
+    "route": "human",
+    "needs_human_review": true,
+    "review_flags": [
+      "low_confidence",
+      "possible_prompt_injection",
+      "sensitive_data_in_ticket"
+    ],
+    "escalation_reason": "low confidence (0.35 < 0.8); not deflectable: The ticket has a subject claiming urgent payroll deadline and broken billing, but the body was removed as suspected prompt injection, so the actual request is unclear. Without a concrete issue I cannot verify a P0/P1 impact, so it is vague and needs human review; not deflectable.",
+    "draft_response": null,
+    "kb_sources": [],
+    "drafts_attempted": 0,
+    "reasoning": "The ticket has a subject claiming urgent payroll deadline and broken billing, but the body was removed as suspected prompt injection, so the actual request is unclear. Without a concrete issue I cannot verify a P0/P1 impact, so it is vague and needs human review; not deflectable.",
+    "audit_trail": [
+      "guard: injection=True sensitive=True",
+      "minimize: raw subject and body dropped from state",
+      "classify: other/P1/general/no @ 0.35",
+      "policy: escalate",
+      "finalize: human"
+    ]
+  }
+]

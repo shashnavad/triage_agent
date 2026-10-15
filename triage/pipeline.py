@@ -7,6 +7,7 @@ from . import config
 from .graph import build_graph
 from .llm import LLM
 from .retrieval import HybridRetriever
+from . import config, guardrails
 
 TICKET_FIELDS = ["ticket_id", "created_at", "channel", "customer_org", "requester", "subject", "body"]
 
@@ -44,7 +45,8 @@ def to_record(ticket: dict, s: dict) -> dict:
         flags.append("sensitive_data_in_ticket")
     return {
         "ticket_id": ticket["ticket_id"],
-        "subject": ticket["subject"],
+        "subject": s.get("safe_subject", ""),
+        "redactions": s.get("redactions", {}),
         "category": s.get("category", "other"),
         "priority": s.get("priority", "P2"),
         "product_area": s.get("product_area", "general"),
@@ -64,7 +66,7 @@ def to_record(ticket: dict, s: dict) -> dict:
 
 
 def error_record(ticket: dict, err: Exception) -> dict:
-    return {"ticket_id": ticket["ticket_id"], "subject": ticket["subject"], "category": "other", "priority": "P2",
+    return {"ticket_id": ticket["ticket_id"], "subject": guardrails.sanitize(ticket["subject"])["text"], "redactions": {}, "category": "other", "priority": "P2",
             "product_area": "general", "deflectable": "no", "model_deflectable": "no", "confidence_score": 0.0,
             "route": "human", "needs_human_review": True, "review_flags": ["pipeline_error"],
             "escalation_reason": f"pipeline error: {type(err).__name__}: {err}", "draft_response": None,

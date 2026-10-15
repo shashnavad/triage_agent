@@ -83,3 +83,11 @@ def test_one_bad_ticket_does_not_stop_the_batch():
             raise RuntimeError("api down")
     r = run(Boom(), "x", "y")
     assert r["route"] == "human" and r["needs_human_review"]
+
+def test_pii_masked_in_subject_and_raw_ticket_dropped():
+    llm = FakeLLM()
+    r = run(llm, "Card 4111 1111 1111 1111 declined", "My SSN is 123-45-6789. How do I reset my password?")
+    assert "4111" not in str(r) and "123-45-6789" not in str(r)
+    assert all("4111" not in u and "123-45-6789" not in u for u in llm.seen)
+    assert r["redactions"]["id_number"] == 1
+    assert any (a.startswith("minimize:") for a in r["audit_trail"])
